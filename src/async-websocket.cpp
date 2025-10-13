@@ -12,7 +12,7 @@ auto AsyncContext::init(coop::TaskInjector& injector, const ContextParams& param
 
 auto AsyncContext::process_until_finish() -> coop::Async<void> {
     while(state == ws::client::State::Connected) {
-        co_await coop::run_blocking([this]() { process(); });
+        co_await coop::ThreadAdapter([this]() { process(); });
     }
     disconnected.notify();
 }

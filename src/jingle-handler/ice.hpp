@@ -3,7 +3,8 @@
 #include <span>
 #include <thread>
 
-#include <nice/agent.h>
+// #include <nice/agent.h>
+#include <nice.h>
 
 #include "../jingle/jingle.hpp"
 #include "../macros/autoptr.hpp"

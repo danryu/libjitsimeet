@@ -106,6 +106,7 @@ const auto codec_type_str = make_pair_table<CodecType, std::string_view>({
     {CodecType::H264, "h264"},
     {CodecType::Vp8, "vp8"},
     {CodecType::Vp9, "vp9"},
+    {CodecType::Av1, "av1"},
 });
 
 auto jid_node_to_muc_resource(const std::string_view node) -> std::string {

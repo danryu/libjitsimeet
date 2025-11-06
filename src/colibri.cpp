@@ -21,6 +21,13 @@ auto find_transport(const jingle::Jingle& jingle) -> const jingle::IceUdpTranspo
 
 auto Colibri::set_last_n(const int n) -> void {
     const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","lastN":{}}})", n);
+    LOG_INFO(logger, "Colibri send: {}", payload);
+    ensure(ws_context.send(payload));
+}
+
+auto Colibri::set_default_max_height(const int max_height) -> void {
+    const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","defaultConstraints":{{"maxHeight":{}}}}})", max_height);
+    LOG_INFO(logger, "Colibri send: {}", payload);
     ensure(ws_context.send(payload));
 }
 
@@ -44,6 +51,7 @@ auto Colibri::connect(const jingle::Jingle& initiate_jingle, const bool secure) 
         .port      = ws_uri.port,
         .ssl_level = secure ? ws::client::SSLLevel::Enable : ws::client::SSLLevel::TrustSelfSigned,
     }));
+    obj->ws_context.dump_packets = true;
     return obj;
 }
 } // namespace colibri

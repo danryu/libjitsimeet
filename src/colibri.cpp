@@ -31,6 +31,13 @@ auto Colibri::set_default_max_height(const int max_height) -> void {
     ensure(ws_context.send(payload));
 }
 
+auto Colibri::set_source_max_height(const std::string_view source_name, const int max_height) -> void {
+    const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","constraints":{{"{}":{{"maxHeight":{}}}}}}})",
+                                     source_name, max_height);
+    LOG_INFO(logger, "Colibri send: {}", payload);
+    ensure(ws_context.send(payload));
+}
+
 Colibri::~Colibri() {
 }
 

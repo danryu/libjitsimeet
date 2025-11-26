@@ -51,7 +51,7 @@ auto Colibri::connect(const jingle::Jingle& initiate_jingle, const bool secure) 
         .port      = ws_uri.port,
         .ssl_level = secure ? ws::client::SSLLevel::Enable : ws::client::SSLLevel::TrustSelfSigned,
     }));
-    obj->ws_context.dump_packets = true;
+    // obj->ws_context.dump_packets = true;
     return obj;
 }
 } // namespace colibri

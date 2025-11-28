@@ -487,6 +487,52 @@ auto Conference::send_iq(xml::Node node, std::function<void(bool)> on_result) ->
     callbacks->send_payload(xml::deparse(node));
 }
 
+auto Conference::set_audio_muted(const bool muted) -> void {
+    config.audio_muted = muted;
+    // Send presence update with new mute state
+    const auto presence =
+        xmpp::elm::presence.clone()
+            .append_attrs({
+                {"to", config.get_muc_local_jid().as_full()},
+            })
+            .append_children({
+                xml::Node{
+                    .name = "audiomuted",
+                    .data = muted ? "true" : "false",
+                },
+                xml::Node{
+                    .name = "videomuted",
+                    .data = config.video_muted ? "true" : "false",
+                },
+                xmpp::elm::nick.clone()
+                    .set_data(config.nick),
+            });
+    callbacks->send_payload(xml::deparse(presence));
+}
+
+auto Conference::set_video_muted(const bool muted) -> void {
+    config.video_muted = muted;
+    // Send presence update with new mute state
+    const auto presence =
+        xmpp::elm::presence.clone()
+            .append_attrs({
+                {"to", config.get_muc_local_jid().as_full()},
+            })
+            .append_children({
+                xml::Node{
+                    .name = "audiomuted",
+                    .data = config.audio_muted ? "true" : "false",
+                },
+                xml::Node{
+                    .name = "videomuted",
+                    .data = muted ? "true" : "false",
+                },
+                xmpp::elm::nick.clone()
+                    .set_data(config.nick),
+            });
+    callbacks->send_payload(xml::deparse(presence));
+}
+
 auto Conference::create(Config config, ConferenceCallbacks* const callbacks) -> std::unique_ptr<Conference> {
     auto conf = new Conference{
         .config    = std::move(config),

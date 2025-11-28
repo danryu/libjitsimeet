@@ -78,6 +78,10 @@ struct Conference {
     auto feed_payload(std::string_view payload) -> bool;
     auto send_iq(xml::Node iq, std::function<void(bool)> on_result) -> void;
 
+    // Mute controls - update local mute state and send presence update
+    auto set_audio_muted(bool muted) -> void;
+    auto set_video_muted(bool muted) -> void;
+
     static auto create(Config config, ConferenceCallbacks* callbacks) -> std::unique_ptr<Conference>;
 
     ~Conference() {};

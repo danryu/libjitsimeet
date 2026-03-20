@@ -1,6 +1,6 @@
 crypto-utils https://github.com/mojyack/crypto-utils.git fead15d35f50809a057fc544966afaffa3e6d3c8
 cutil https://github.com/mojyack/cutil.git d3c64048ac2635b231d6c733a5a15dae4e28b22d
-cutil-macros https://github.com/danryu/cutil-macros.git b22432a7eaf4c38ff97c6a09e69560c81469694d
+cutil-macros https://github.com/danryu/cutil-macros.git 16d9bb0b326806ed1bd61a04f87ce4eb57bff27b
 serde https://github.com/mojyack/serde.git 10399308f8a38d97f7b489b5c980c81e6fe5d860
 tinyjson https://github.com/mojyack/tinyjson.git 9ecd79da797e8d7f8d21d4c4045e6e3e27dd76a7
 tinyxml https://github.com/mojyack/tinyxml.git 29dc7b3d6a3e349789d74eb533530140f48fef5a

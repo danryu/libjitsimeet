@@ -1,7 +1,7 @@
-crypto-utils https://github.com/mojyack/crypto-utils.git 2c6e3b8ccbc6cdd29680f90580066dc8bc784adc
-cutil https://github.com/mojyack/cutil.git 727f2eb4fced457d3b8ccf21e82408a3a4fa3df5
-cutil-macros https://github.com/mojyack/cutil-macros.git 986ced60b3c5c99364201f83a26ee5433a91a5f8
-serde https://github.com/mojyack/serde.git 7382010975b9aff36ff672e4b9e201bb0c279e84
-tinyjson https://github.com/mojyack/tinyjson.git 018d47cd844e1a339c213f66494b0fce1f18e31f
-tinyxml https://github.com/mojyack/tinyxml.git e358c62a9024e040f14e8d0086718f5311a8ce89
-websocket-cpp https://github.com/mojyack/websocket-cpp.git 0d0338f885b4ded6a5e5488ec99b185c357df883
+crypto-utils https://github.com/mojyack/crypto-utils.git fead15d35f50809a057fc544966afaffa3e6d3c8
+cutil https://github.com/mojyack/cutil.git d3c64048ac2635b231d6c733a5a15dae4e28b22d
+cutil-macros https://github.com/danryu/cutil-macros.git b22432a7eaf4c38ff97c6a09e69560c81469694d
+serde https://github.com/mojyack/serde.git 10399308f8a38d97f7b489b5c980c81e6fe5d860
+tinyjson https://github.com/mojyack/tinyjson.git 9ecd79da797e8d7f8d21d4c4045e6e3e27dd76a7
+tinyxml https://github.com/mojyack/tinyxml.git 29dc7b3d6a3e349789d74eb533530140f48fef5a
+websocket-cpp https://github.com/mojyack/websocket-cpp.git 58c4069075ece36b250d63619b40d6f9f123bc63

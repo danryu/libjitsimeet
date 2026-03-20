@@ -6,7 +6,7 @@
 #include "ws/client.hpp"
 
 namespace ws::client {
-using OnDataReceivedAsync = coop::Async<void>(std::span<const std::byte> payload);
+using OnDataReceivedAsync = coop::Async<void>(PrependableBuffer payload);
 
 struct AsyncContext : Context {
     std::function<OnDataReceivedAsync> handler;

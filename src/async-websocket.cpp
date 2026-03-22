@@ -4,8 +4,8 @@
 
 namespace ws::client {
 auto AsyncContext::init(coop::TaskInjector& injector, const ContextParams& params) -> bool {
-    Context::handler = [this, &injector](const std::span<const std::byte> data) {
-        injector.inject_task(handler(data));
+    Context::handler = [this, &injector](PrependableBuffer data) {
+        injector.inject_task(handler(std::move(data)));
     };
     return Context::init(params);
 }

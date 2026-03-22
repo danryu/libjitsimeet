@@ -21,6 +21,23 @@ auto find_transport(const jingle::Jingle& jingle) -> const jingle::IceUdpTranspo
 
 auto Colibri::set_last_n(const int n) -> void {
     const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","lastN":{}}})", n);
+    LOG_INFO(logger, "Colibri send: {}", payload);
+    ensure(ws_context.send(payload));
+}
+
+auto Colibri::set_default_max_height(const int max_height) -> void {
+    const auto payload = std::format(
+        R"({{"colibriClass":"ReceiverVideoConstraints","defaultConstraints":{{"maxHeight":{}}}}})", max_height);
+    LOG_INFO(logger, "Colibri send: {}", payload);
+    ensure(ws_context.send(payload));
+}
+
+auto Colibri::set_source_max_height(const std::string_view source_name, const int max_height) -> void {
+    const auto payload = std::format(
+        R"({{"colibriClass":"ReceiverVideoConstraints","constraints":{{"{}":{{"maxHeight":{}}}}}}})",
+        source_name,
+        max_height);
+    LOG_INFO(logger, "Colibri send: {}", payload);
     ensure(ws_context.send(payload));
 }
 
@@ -41,8 +58,10 @@ auto Colibri::connect(const jingle::Jingle& initiate_jingle, const bool secure) 
         .address   = uri_domain.data(),
         .path      = uri_path.data(),
         .protocol  = "xmpp",
-        .port      = ws_uri.port,
+        .port      = static_cast<int>(ws_uri.port),
         .ssl_level = secure ? ws::client::SSLLevel::Enable : ws::client::SSLLevel::TrustSelfSigned,
+        // libwebsockets TCP keepalive (ping probes); keeps bridge channel alive behind NATs
+        .keepalive = {.time = 25, .probes = 3, .interval = 5},
     }));
     return obj;
 }

@@ -194,7 +194,8 @@ auto handle_iq_result(Conference* const conf, const xml::Node& iq, bool success)
         conf->sent_iqs.erase(i);
         return true;
     }
-    bail("stray iq result");
+    LOG_WARN(logger, "stray iq result id={}", id);
+    return true;
 }
 
 auto handle_iq(Conference* const conf, const xml::Node& iq) -> bool {
@@ -317,101 +318,61 @@ auto handle_presence(Conference* const conf, const xml::Node& presence) -> bool 
     return true;
 }
 
-auto handle_received(Conference* const conf) -> Conference::Worker::Generator {
-    constexpr auto error_value = false;
-
-    // disco
-    {
-        const auto id   = conf->generate_iq_id();
-        const auto muid = std::format("muid_{}", rng::generate_random_uint32());
-        const auto iq   = xmpp::elm::iq.clone()
+auto send_initial_presence(Conference* const conf) -> bool {
+    const auto codec_type = codec_type_str.find(conf->config.video_codec_type);
+    ensure(codec_type != nullptr, "invalid codec type config");
+    const auto presence =
+        xmpp::elm::presence.clone()
+            .append_attrs({
+                {"to", conf->config.get_muc_local_jid().as_full()},
+            })
+            .append_children({
+                xmpp::elm::muc,
+                xmpp::elm::caps.clone()
+                    .append_attrs({
+                        {"hash", "sha-1"},
+                        {"node", disco_node},
+                        {"ver", conf->disco_sha1_base64},
+                    }),
+                xmpp::elm::ecaps2.clone()
+                    .append_children({
+                        xmpp::elm::hash.clone()
+                            .set_data(conf->disco_sha256_base64)
                             .append_attrs({
-                                {"to", conf->config.get_focus_jid().as_full()},
-                                {"id", id},
-                                {"type", "set"},
-                            })
-                            .append_children({
-                                xmpp::elm::conference.clone()
-                                    .append_attrs({
-                                        {"machine-uid", muid},
-                                        {"room", conf->config.get_muc_jid().as_bare()},
-                                    })
-                                    .append_children({
-                                        xmpp::elm::property.clone()
-                                            .append_attrs({
-                                                {"stereo", "false"},
-                                            }),
-                                        xmpp::elm::property.clone()
-                                            .append_attrs({
-                                                {"startBitrate", "800"},
-                                            }),
-                                    }),
-                            });
-        conf->callbacks->send_payload(xml::deparse(iq));
-        co_yield true;
+                                {"algo", "sha-256"},
+                            }),
+                    }),
+                xml::Node{
+                    .name = "stats-id",
+                    .data = "libjitsimeet",
+                },
+                xml::Node{
+                    .name = "jitsi_participant_codecType",
+                    .data = codec_type->data(),
+                },
+                xml::Node{
+                    .name = "jitsi_participant_codecList",
+                    .data = codec_type->data(),
+                },
+                xml::Node{
+                    .name = "videomuted",
+                    .data = conf->config.video_muted ? "true" : "false",
+                },
+                xml::Node{
+                    .name = "audiomuted",
+                    .data = conf->config.audio_muted ? "true" : "false",
+                },
+                xmpp::elm::nick.clone()
+                    .set_data(conf->config.nick),
+            });
+    conf->callbacks->send_payload(xml::deparse(presence));
+    return true;
+}
 
-        const auto response = xml::parse(conf->worker_arg).value();
-        co_ensure_v(response.name == "iq", "unexpected response");
-        co_ensure_v(response.is_attr_equal("id", id), "unexpected iq");
-        co_ensure_v(response.is_attr_equal("type", "result"), "unexpected iq");
-        const auto conference = response.find_first_child("conference");
-        co_ensure_v(conference != nullptr);
-        co_ensure_v(conference->is_attr_equal("ready", "true"), "conference not ready");
-    }
-    // presence
-    {
-        const auto codec_type = codec_type_str.find(conf->config.video_codec_type);
-        co_ensure_v(codec_type != nullptr, "invalid codec type config");
-        const auto presence =
-            xmpp::elm::presence.clone()
-                .append_attrs({
-                    {"to", conf->config.get_muc_local_jid().as_full()},
-                })
-                .append_children({
-                    xmpp::elm::muc,
-                    xmpp::elm::caps.clone()
-                        .append_attrs({
-                            {"hash", "sha-1"},
-                            {"node", disco_node},
-                            {"ver", conf->disco_sha1_base64},
-                        }),
-                    xmpp::elm::ecaps2.clone()
-                        .append_children({
-                            xmpp::elm::hash.clone()
-                                .set_data(conf->disco_sha256_base64)
-                                .append_attrs({
-                                    {"algo", "sha-256"},
-                                }),
-                        }),
-                    xml::Node{
-                        .name = "stats-id",
-                        .data = "libjitsimeet",
-                    },
-                    xml::Node{
-                        .name = "jitsi_participant_codecType",
-                        .data = codec_type->data(),
-                    },
-                    xml::Node{
-                        .name = "jitsi_participant_codecList",
-                        .data = codec_type->data(),
-                    },
-                    xml::Node{
-                        .name = "videomuted",
-                        .data = conf->config.video_muted ? "true" : "false",
-                    },
-                    xml::Node{
-                        .name = "audiomuted",
-                        .data = conf->config.audio_muted ? "true" : "false",
-                    },
-                    xmpp::elm::nick.clone()
-                        .set_data(conf->config.nick),
-                });
-
-        conf->callbacks->send_payload(xml::deparse(presence));
-        co_yield true;
-    }
-
-    // idle
+auto handle_received(Conference* const conf) -> Conference::Worker::Generator {
+    // Pure stanza dispatcher. Disco IQ + initial presence are sent from
+    // start_negotiation; the disco result arrives here as a normal IQ result
+    // and is routed to its callback by id via handle_iq_result.
 loop:
     auto yield = false;
     do {
@@ -468,7 +429,42 @@ auto Conference::generate_iq_id() -> std::string {
 
 auto Conference::start_negotiation() -> void {
     worker.start(handle_received, this);
-    worker.resume();
+    // Don't pre-resume; the worker is suspended at initial_suspend and will
+    // run on the first feed_payload with a real stanza.
+
+    const auto muid = std::format("muid_{}", rng::generate_random_uint32());
+    auto       disco_iq =
+        xmpp::elm::iq.clone()
+            .append_attrs({
+                {"to", config.get_focus_jid().as_full()},
+                {"type", "set"},
+                // id is set by send_iq
+            })
+            .append_children({
+                xmpp::elm::conference.clone()
+                    .append_attrs({
+                        {"machine-uid", muid},
+                        {"room", config.get_muc_jid().as_bare()},
+                    })
+                    .append_children({
+                        xmpp::elm::property.clone()
+                            .append_attrs({
+                                {"stereo", "false"},
+                            }),
+                        xmpp::elm::property.clone()
+                            .append_attrs({
+                                {"startBitrate", "800"},
+                            }),
+                    }),
+            });
+
+    send_iq(std::move(disco_iq), [this](const bool success) -> void {
+        if(!success) {
+            LOG_ERROR(logger, "disco failed");
+            return;
+        }
+        send_initial_presence(this);
+    });
 }
 
 auto Conference::feed_payload(const std::string_view payload) -> bool {

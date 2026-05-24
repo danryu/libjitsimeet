@@ -21,7 +21,7 @@ auto find_transport(const jingle::Jingle& jingle) -> const jingle::IceUdpTranspo
 
 auto Colibri::set_last_n(const int n) -> void {
     const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","lastN":{}}})", n);
-    ensure(ws_context.send(payload));
+    ensure_v(ws_context.send(payload));
 }
 
 Colibri::~Colibri() {
@@ -41,7 +41,7 @@ auto Colibri::connect(const jingle::Jingle& initiate_jingle, const bool secure) 
         .address   = uri_domain.data(),
         .path      = uri_path.data(),
         .protocol  = "xmpp",
-        .port      = ws_uri.port,
+        .port      = static_cast<int>(ws_uri.port),
         .ssl_level = secure ? ws::client::SSLLevel::Enable : ws::client::SSLLevel::TrustSelfSigned,
     }));
     return obj;

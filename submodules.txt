@@ -1,7 +1,7 @@
-crypto-utils https://github.com/danryu/crypto-utils.git msvc
-cutil https://github.com/danryu/cutil.git msvc
-cutil-macros https://github.com/danryu/cutil-macros.git msvc
-serde https://github.com/danryu/serde.git msvc
-tinyjson https://github.com/danryu/tinyjson.git msvc
-tinyxml https://github.com/danryu/tinyxml.git msvc
-websocket-cpp https://github.com/danryu/websocket-cpp.git msvc
+crypto-utils https://github.com/danryu/crypto-utils.git 9b9441a07a581f4f2e61aab7dff9e3c1eb2a49cd
+cutil https://github.com/danryu/cutil.git acf93ad5575ff11f134d1c258a3644b8b3d678d8
+cutil-macros https://github.com/danryu/cutil-macros.git 7f8dada54eab42d6c8c83dde69bc5d318bd18571
+serde https://github.com/danryu/serde.git 5d642e6a5b481553123f914818e301938bad7d31
+tinyjson https://github.com/danryu/tinyjson.git 694b45ccf5d12b74cac3edadb4b8dccebc0626f1
+tinyxml https://github.com/danryu/tinyxml.git d2e9fbdfd0938004ad49b975dfd675233b18c4b7
+websocket-cpp https://github.com/danryu/websocket-cpp.git 2c2fc67ac4d4399cf3a6ab8cd80ffd94f8b40030

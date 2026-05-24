@@ -1,7 +1,7 @@
-crypto-utils https://github.com/mojyack/crypto-utils.git 2c6e3b8ccbc6cdd29680f90580066dc8bc784adc
-cutil https://github.com/mojyack/cutil.git d3c64048ac2635b231d6c733a5a15dae4e28b22d
-cutil-macros https://github.com/mojyack/cutil-macros.git 986ced60b3c5c99364201f83a26ee5433a91a5f8
+crypto-utils https://github.com/danryu/crypto-utils.git kdev3
+cutil https://github.com/danryu/cutil.git kdev3
+cutil-macros https://github.com/danryu/cutil-macros.git kdev3
 serde https://github.com/mojyack/serde.git 7382010975b9aff36ff672e4b9e201bb0c279e84
-tinyjson https://github.com/mojyack/tinyjson.git 018d47cd844e1a339c213f66494b0fce1f18e31f
-tinyxml https://github.com/mojyack/tinyxml.git e358c62a9024e040f14e8d0086718f5311a8ce89
+tinyjson https://github.com/danryu/tinyjson.git kdev3
+tinyxml https://github.com/danryu/tinyxml.git kdev3
 websocket-cpp https://github.com/danryu/websocket-cpp.git kdev3

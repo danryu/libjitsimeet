@@ -7,7 +7,10 @@
 #include <WinSock2.h>
 #endif
 
-auto hostname_to_addr(const char* const hostname) -> std::string {
+// NOTE: keep `const char*` (no top-level `const`) to match the hostaddr.hpp
+// declaration -- MSVC encodes a parameter's top-level const into the decorated name,
+// so `const char* const` here would fail to link (LNK2019).
+auto hostname_to_addr(const char* hostname) -> std::string {
     auto r = std::string();
 
     const auto host = gethostbyname(hostname);

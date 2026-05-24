@@ -68,19 +68,23 @@ auto cert_new() -> Cert* {
     return new Cert{std::move(pkey), std::move(x)};
 }
 
-auto cert_delete(const Cert* const cert) -> void {
+// NOTE: keep these parameters as `const Cert*` (no top-level `const` on the pointer)
+// to match the declarations in cert.hpp. MSVC encodes a parameter's top-level const
+// into the decorated name, so `const Cert* const` here would not link against the
+// header's `const Cert*` (LNK2019 unresolved external).
+auto cert_delete(const Cert* cert) -> void {
     delete cert;
 }
 
-auto serialize_cert_der(const Cert* const cert) -> std::optional<std::vector<std::byte>> {
+auto serialize_cert_der(const Cert* cert) -> std::optional<std::vector<std::byte>> {
     return serialize_der(i2d_X509, cert->x.get());
 }
 
-auto serialize_private_key_der(const Cert* const cert) -> std::optional<std::vector<std::byte>> {
+auto serialize_private_key_der(const Cert* cert) -> std::optional<std::vector<std::byte>> {
     return serialize_der(i2d_PrivateKey, cert->pkey.get());
 }
 
-auto serialize_private_key_pkcs8_der(const Cert* const cert) -> std::optional<std::vector<std::byte>> {
+auto serialize_private_key_pkcs8_der(const Cert* cert) -> std::optional<std::vector<std::byte>> {
     const auto pkcs8 = AutoPKCS8PKeyInfo(EVP_PKEY2PKCS8(cert->pkey.get()));
     return serialize_der(i2d_PKCS8_PRIV_KEY_INFO, pkcs8.get());
 }

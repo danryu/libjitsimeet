@@ -21,7 +21,7 @@ auto find_transport(const jingle::Jingle& jingle) -> const jingle::IceUdpTranspo
 
 auto Colibri::set_last_n(const int n) -> void {
     const auto payload = std::format(R"({{"colibriClass":"ReceiverVideoConstraints","lastN":{}}})", n);
-    ensure_v(ws_context.send(payload));
+    ensure(ws_context.send(payload));
 }
 
 Colibri::~Colibri() {

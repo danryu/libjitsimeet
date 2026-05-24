@@ -22,7 +22,7 @@ struct XMPPNegotiatorCallbacks : public xmpp::NegotiatorCallbacks {
     ws::client::Context* ws_context;
 
     virtual auto send_payload(std::string_view payload) -> void override {
-        ensure_v(ws_context->send(payload));
+        ensure(ws_context->send(payload));
     }
 };
 
@@ -31,7 +31,7 @@ struct ConferenceCallbacks : public conference::ConferenceCallbacks {
     JingleHandler*       jingle_handler;
 
     virtual auto send_payload(std::string_view payload) -> void override {
-        ensure_v(ws_context->send(payload));
+        ensure(ws_context->send(payload));
     }
 
     virtual auto on_jingle(jingle::Jingle jingle) -> bool override {
